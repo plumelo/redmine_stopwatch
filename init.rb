@@ -1,5 +1,3 @@
-require_dependency 'stopwatch'
-
 Redmine::Plugin.register :stopwatch do
   name 'Redmine Stopwatch Plugin'
   author 'Jens Krämer'
@@ -20,8 +18,11 @@ Redmine::Plugin.register :stopwatch do
     if: ->(*_){ User.current.logged? and User.current.allowed_to?(:log_time, nil, global: true) }
 end
 
+if Rails.configuration.respond_to?(:autoloader) && Rails.configuration.autoloader == :zeitwerk
+  Rails.autoloaders.each { |loader| loader.ignore(File.dirname(__FILE__) + '/lib') }
+end
+require File.dirname(__FILE__) + '/lib/stopwatch'
 require File.dirname(__FILE__) + '/lib/stopwatch/hooks'
-
 require File.dirname(__FILE__) + '/lib/stopwatch/context_menus_controller_patch'
 require File.dirname(__FILE__) + '/lib/stopwatch/issues_controller_patch'
 require File.dirname(__FILE__) + '/lib/stopwatch/time_entry_patch'
